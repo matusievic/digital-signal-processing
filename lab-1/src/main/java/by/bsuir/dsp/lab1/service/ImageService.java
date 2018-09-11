@@ -24,7 +24,7 @@ public class ImageService {
     }
 
     public static int[] getHistogram(BufferedImage image, char key) {
-        int[] result = new int[255];
+        int[] result = new int[256];
 
         for (int i = 0; i < image.getWidth(); i++) {
             for (int j = 0; j < image.getHeight(); j++) {
