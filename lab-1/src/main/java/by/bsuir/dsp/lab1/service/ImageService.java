@@ -159,4 +159,62 @@ public class ImageService {
 
         return accumulator;
     }
+
+
+    public static BufferedImage highFrequencyFilter(BufferedImage image) {
+        final int[][] core = {
+                {-1, -1, -1},
+                {-1, 9, -1},
+                {-1, -1, -1}
+        };
+
+        BufferedImage result = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_ARGB);
+
+        for (int i = 1; i < image.getWidth() - 1; i++) {
+            for (int j = 1; j < image.getHeight() - 1; j++) {
+                int[][] currentRed = {
+                        {new Color(image.getRGB(i - 1, j - 1)).getRed(), new Color(image.getRGB(i - 1, j)).getRed(), new Color(image.getRGB(i - 1, j + 1)).getRed()},
+                        {new Color(image.getRGB(i, j - 1)).getRed(), new Color(image.getRGB(i, j)).getRed(), new Color(image.getRGB(i, j + 1)).getRed()},
+                        {new Color(image.getRGB(i + 1, j - 1)).getRed(), new Color(image.getRGB(i + 1, j)).getRed(), new Color(image.getRGB(i + 1, j + 1)).getRed()}
+                };
+
+                int red = calculateProperty(core, currentRed);
+                if (red > 255) {
+                    red = 255;
+                } else if (red < 0) {
+                    red = 0;
+                }
+
+                int[][] currentGreen = {
+                        {new Color(image.getRGB(i - 1, j - 1)).getGreen(), new Color(image.getRGB(i - 1, j)).getGreen(), new Color(image.getRGB(i - 1, j + 1)).getGreen()},
+                        {new Color(image.getRGB(i, j - 1)).getGreen(), new Color(image.getRGB(i, j)).getGreen(), new Color(image.getRGB(i, j + 1)).getGreen()},
+                        {new Color(image.getRGB(i + 1, j - 1)).getGreen(), new Color(image.getRGB(i + 1, j)).getGreen(), new Color(image.getRGB(i + 1, j + 1)).getGreen()}
+                };
+
+                int green = calculateProperty(core, currentGreen);
+                if (green > 255) {
+                    green = 255;
+                } else if (green < 0) {
+                    green = 0;
+                }
+
+                int[][] currentBlue = {
+                        {new Color(image.getRGB(i - 1, j - 1)).getBlue(), new Color(image.getRGB(i - 1, j)).getBlue(), new Color(image.getRGB(i - 1, j + 1)).getBlue()},
+                        {new Color(image.getRGB(i, j - 1)).getBlue(), new Color(image.getRGB(i, j)).getBlue(), new Color(image.getRGB(i, j + 1)).getBlue()},
+                        {new Color(image.getRGB(i + 1, j - 1)).getBlue(), new Color(image.getRGB(i + 1, j)).getBlue(), new Color(image.getRGB(i + 1, j + 1)).getBlue()}
+                };
+
+                int blue = calculateProperty(core, currentBlue);
+                if (blue > 255) {
+                    blue = 255;
+                } else if (blue < 0) {
+                    blue = 0;
+                }
+
+                result.setRGB(i, j, new Color(red, green, blue).getRGB());
+            }
+        }
+
+        return result;
+    }
 }

@@ -62,6 +62,10 @@ public class App extends Application {
     private TextField modeField;
     @FXML
     private Button okButton;
+    @FXML
+    private ImageView unfilteredImage;
+    @FXML
+    private ImageView filteredImage;
 
     public static void main(String[] args) {
         launch(args);
@@ -94,8 +98,16 @@ public class App extends Application {
         // set up dissected output
         setUpDissectedOutput(source, gray, Integer.parseInt(fField.getText()), Integer.parseInt(gField.getText()), Integer.parseInt(modeField.getText()));
 
-        //set up Prewitt output
+        // set up Prewitt output
         setUpPrewittOutput(source, gray);
+
+        // set up filter input
+        BufferedImage unfiltered = ImageIO.read(getClass().getResourceAsStream("/images/unfiltered.jpg"));
+        unfilteredImage.setImage(SwingFXUtils.toFXImage(unfiltered, null));
+
+        // set up filter output
+        BufferedImage filtered = ImageService.highFrequencyFilter(unfiltered);
+        filteredImage.setImage(SwingFXUtils.toFXImage(filtered, null));
 
 
         // set up handler
