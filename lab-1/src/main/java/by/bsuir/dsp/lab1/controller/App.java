@@ -9,6 +9,8 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.chart.BarChart;
 import javafx.scene.chart.XYChart;
+import javafx.scene.control.Button;
+import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
 
@@ -52,6 +54,14 @@ public class App extends Application {
     private BarChart<Integer, Integer> bluePrewittChart;
     @FXML
     private BarChart<Integer, Integer> grayPrewittChart;
+    @FXML
+    private TextField fField;
+    @FXML
+    private TextField gField;
+    @FXML
+    private TextField modeField;
+    @FXML
+    private Button okButton;
 
     public static void main(String[] args) {
         launch(args);
@@ -82,10 +92,14 @@ public class App extends Application {
         setUpSourceHistograms(source, gray);
 
         // set up dissected output
-        setUpDissectedOutput(source, gray);
+        setUpDissectedOutput(source, gray, Integer.parseInt(fField.getText()), Integer.parseInt(gField.getText()), Integer.parseInt(modeField.getText()));
 
         //set up Prewitt output
         setUpPrewittOutput(source, gray);
+
+
+        // set up handler
+        okButton.setOnAction(event -> setUpDissectedOutput(source, gray, Integer.parseInt(fField.getText()), Integer.parseInt(gField.getText()), Integer.parseInt(modeField.getText())));
     }
 
     private void setUpSourceHistograms(BufferedImage source, BufferedImage gray) {
@@ -126,13 +140,13 @@ public class App extends Application {
         grayChart.getData().add(graySeries);
     }
 
-    private void setUpDissectedOutput(BufferedImage source, BufferedImage gray) {
+    private void setUpDissectedOutput(BufferedImage source, BufferedImage gray, int f, int g, int mode) {
         // set up source image
-        BufferedImage sourceDissected = ImageService.dissect(source, 100, 100, 0);
+        BufferedImage sourceDissected = ImageService.dissect(source, f, g, mode);
         sourceDissectedImage.setImage(SwingFXUtils.toFXImage(sourceDissected, null));
 
         // set up gray image
-        BufferedImage grayDissected = ImageService.dissect(gray, 100, 100, 0);
+        BufferedImage grayDissected = ImageService.dissect(gray, f, g, mode);
         grayDissectedImage.setImage(SwingFXUtils.toFXImage(grayDissected, null));
 
         // set up reg histogram
@@ -142,6 +156,7 @@ public class App extends Application {
         for (int i = 0; i < redHistogram.length; i++) {
             redSeries.getData().add(new XYChart.Data(String.valueOf(i), redHistogram[i]));
         }
+        redDissectedChart.getData().clear();
         redDissectedChart.getData().add(redSeries);
 
         //set up green histogram
@@ -151,6 +166,7 @@ public class App extends Application {
         for (int i = 0; i < greenHistogram.length; i++) {
             greenSeries.getData().add(new XYChart.Data(String.valueOf(i), greenHistogram[i]));
         }
+        greenDissectedChart.getData().clear();
         greenDissectedChart.getData().add(greenSeries);
 
         //set up blue histogram
@@ -160,6 +176,7 @@ public class App extends Application {
         for (int i = 0; i < blueHistogram.length; i++) {
             blueSeries.getData().add(new XYChart.Data(String.valueOf(i), blueHistogram[i]));
         }
+        blueDissectedChart.getData().clear();
         blueDissectedChart.getData().add(blueSeries);
 
         //set up gray histogram
@@ -169,6 +186,7 @@ public class App extends Application {
         for (int i = 0; i < grayHistogram.length; i++) {
             graySeries.getData().add(new XYChart.Data(String.valueOf(i), grayHistogram[i]));
         }
+        grayDissectedChart.getData().clear();
         grayDissectedChart.getData().add(graySeries);
     }
 
