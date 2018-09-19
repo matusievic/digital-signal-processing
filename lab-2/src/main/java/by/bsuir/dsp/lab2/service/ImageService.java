@@ -112,19 +112,14 @@ public final class ImageService {
         return result;
     }
 
-    public static BufferedImage mark(BufferedImage image) {
-        BufferedImage result = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_RGB);
-
+    public static int[][] mark(BufferedImage image) {
         int width = image.getWidth();
         int height = image.getHeight();
+        int black = Color.BLACK.getRGB();
 
-        int black = new Color(0, 0, 0).getRGB();
-        int white = new Color(255, 255, 255).getRGB();
         int label = 0;
 
         int[][] map = new int[width][height];
-
-        List<Integer> unusedLabels = new ArrayList<>();
 
         for (int i = 1; i < width; i++) {
             for (int j = 1; j < height; j++) {
@@ -157,23 +152,35 @@ public final class ImageService {
                             }
                         }
 
-                        unusedLabels.add(cMark);
                         map[i][j] = bMark;
                     }
                 }
             }
         }
 
+        return map;
+    }
+
+    public static BufferedImage mapToImage(int[][] map) {
         Color[] colors = {Color.BLUE, Color.CYAN, Color.YELLOW, Color.RED, Color.GREEN, Color.MAGENTA, Color.ORANGE, Color.PINK, Color.LIGHT_GRAY, Color.GRAY};
 
-        List<Integer> labels = new ArrayList<>(label);
-        for (int i = 1; i <= label; i++) {
-            labels.add(i);
-        }
-        labels.removeAll(unusedLabels);
+        int width = map.length;
+        int height = map[0].length;
 
-        Random r = new Random(255);
+        BufferedImage result = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+
+        List<Integer> labels = new ArrayList<>();
+        for (int i = 0; i < width; i++) {
+            for (int j = 0; j < height; j++) {
+                int cur = map[i][j];
+                if (cur != 0 && !labels.contains(cur)) {
+                    labels.add(cur);
+                }
+            }
+        }
+
         Map<Integer, Color> colorMap = new HashMap<>(labels.size());
+        Random r = new Random();
         for (int i = 0; i < labels.size(); i++) {
             Color color = null;
             if (i < colors.length) {
