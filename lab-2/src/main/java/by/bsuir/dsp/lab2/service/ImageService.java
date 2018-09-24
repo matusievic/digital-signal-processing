@@ -200,4 +200,82 @@ public final class ImageService {
 
         return result;
     }
+
+    public static Map<Integer, Property> getProperties(int[][] map) {
+        int width = map.length;
+        int height = map[0].length;
+
+        Map<Integer, List<Point>> points = new HashMap<>();
+        for (int i = 0; i < width; i++) {
+            for (int j = 0; j < height; j++) {
+                int cur = map[i][j];
+                if (cur != 0) {
+                    points.putIfAbsent(cur, new ArrayList<>());
+                    points.get(cur).add(new Point(i, j));
+                }
+            }
+        }
+
+        int count = points.size();
+        Map<Integer, Integer> square = new HashMap<>(count);
+        Map<Integer, Integer> perimeter = new HashMap<>(count);
+        Map<Integer, Double> centerX = new HashMap<>(count);
+        Map<Integer, Double> centerY = new HashMap<>(count);
+        Map<Integer, Double> density = new HashMap<>(count);
+        Map<Integer, Double> elongation = new HashMap<>(count);
+        Map<Integer, Double> orientation = new HashMap<>(count);
+
+        points.forEach((k, v) -> {
+            int size = v.size();
+
+            // square
+            square.put(k, size);
+
+            // perimeter
+            v.forEach(p -> {
+                if (map[p.x - 1][p.y] == 0 || map[p.x + 1][p.y] == 0 || map[p.x][p.y - 1] == 0 || map[p.x][p.y + 1] == 0) {
+                    perimeter.merge(k, 1, (cur, i) -> cur + i);
+                }
+            });
+
+            // center
+            centerX.put(k, v.stream().mapToDouble(p -> p.x).sum() / size);
+            centerY.put(k, v.stream().mapToDouble(p -> p.y).sum() / size);
+
+            // density
+            density.put(k, (Math.pow(perimeter.get(k), 2) / square.get(k)));
+
+            // auxiliary params
+            double xCenter = centerX.get(k);
+            double m20 = v.stream().mapToDouble(p -> p.x - xCenter).sum();
+
+            double yCenter = centerY.get(k);
+            double m02 = v.stream().mapToDouble(p -> p.y - yCenter).sum();
+
+            double m11 = v.stream().mapToDouble(p -> (p.x - xCenter) * (p.y - yCenter)).sum();
+
+            // elongation
+            double a = m20 + m02;
+            double b = Math.sqrt(Math.pow(m20 - m02, 2) + 4 * Math.pow(m11, 2));
+            elongation.put(k, (a + b) / (a - b));
+
+            // orientation
+            orientation.put(k, (1 / 2) * Math.atan((2 * m11) / (m20 - m02)));
+        });
+
+        Map<Integer, Property> result = new HashMap<>(count);
+        for (int label : points.keySet()) {
+            result.put(label, Property.builder()
+                                      .square(square.get(label))
+                                      .perimeter(perimeter.get(label))
+                                      .centerX(centerX.get(label))
+                                      .centerY(centerY.get(label))
+                                      .density(density.get(label))
+                                      .elongation(elongation.get(label))
+                                      .orientation(orientation.get(label))
+                                      .build());
+        }
+
+        return result;
+    }
 }
