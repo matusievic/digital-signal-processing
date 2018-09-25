@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 public final class ImageService {
     public static BufferedImage toGrayscaled(BufferedImage image) {
@@ -274,6 +275,123 @@ public final class ImageService {
                                       .elongation(elongation.get(label))
                                       .orientation(orientation.get(label))
                                       .build());
+        }
+
+        return result;
+    }
+
+    public static List<List<Map.Entry<Integer, Property>>> kMeans(Map<Integer, Property> objects, int k) {
+        //Map<Property, List<Map.Entry<Integer, Property>>> clusters = new HashMap<>(k);
+        List<List<Map.Entry<Integer, Property>>> clusters = new ArrayList<>(k);
+        for (int i = 0; i < k; i++) {
+            clusters.add(new ArrayList<>());
+        }
+
+        List<Property> centers = new ArrayList<>(k);
+
+        Random r = new Random();
+        for (int i = 0; i < k; i++) {
+            centers.add(Property.builder()
+                                .square(r.nextInt(20))
+                                .perimeter(r.nextInt(20))
+                                .density(r.nextInt(20))
+                                .elongation(r.nextInt(20))
+                                .orientation(r.nextInt(20))
+                                .build());
+        }
+
+
+        boolean isChanged;
+
+        do {
+            isChanged = false;
+
+            for (Map.Entry<Integer, Property> o : objects.entrySet()) {
+                Property cluster = nearest(o.getValue(), centers);
+                int ind = centers.indexOf(cluster);
+
+                if (!clusters.get(ind).contains(o)) {
+                    clusters.forEach(ls -> ls.remove(o));
+                    clusters.get(ind).add(o);
+
+                    updateCenter(cluster, clusters.get(ind));
+
+                    isChanged = true;
+                }
+            }
+
+        } while (isChanged);
+
+        return clusters;
+    }
+
+    private static double distance(Property p1, Property p2) {
+        return Math.sqrt(Math.pow(p1.getSquare() - p2.getSquare(), 2)
+                + Math.pow(p1.getPerimeter() - p2.getPerimeter(), 2)
+                + Math.pow(p1.getDensity() - p2.getDensity(), 2)
+                + Math.pow(p1.getElongation() - p2.getElongation(), 2)
+                + Math.pow(p1.getOrientation() - p2.getOrientation(), 2));
+    }
+
+    private static Property nearest(Property p, List<Property> centers) {
+        Property cluster = null;
+        double minDist = Double.MAX_VALUE;
+
+        for (Property c : centers) {
+            double dist = distance(c, p);
+            if (dist < minDist) {
+                minDist = dist;
+                cluster = c;
+            }
+        }
+
+        return cluster;
+    }
+
+    private static void updateCenter(Property c, List<Map.Entry<Integer, Property>> objects) {
+        int count = objects.size();
+        c.setSquare(objects.stream().mapToInt(e -> e.getValue().getSquare()).sum() / count);
+        c.setPerimeter(objects.stream().mapToInt(e -> e.getValue().getPerimeter()).sum() / count);
+        c.setDensity(objects.stream().mapToDouble(e -> e.getValue().getDensity()).sum() / count);
+        c.setElongation(objects.stream().mapToDouble(e -> e.getValue().getElongation()).sum() / count);
+        c.setOrientation(objects.stream().mapToDouble(e -> e.getValue().getOrientation()).sum() / count);
+    }
+
+    public static BufferedImage mapToClusteredImage(int[][] map, List<List<Map.Entry<Integer, Property>>> clusters) {
+        int count = clusters.size();
+        int width = map.length;
+        int height = map[0].length;
+
+        List<List<Integer>> labels = clusters.stream()
+                                             .map(ls -> ls.stream().map(Map.Entry::getKey).collect(Collectors.toList()))
+                                             .collect(Collectors.toList());
+
+        BufferedImage result = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        List<Color> colors = new ArrayList<>(count);
+        Random r = new Random();
+        for (int i = 0; i < count; i++) {
+            colors.add(new Color(r.nextInt(255), r.nextInt(255), r.nextInt(255)));
+        }
+
+        for (int i = 0; i < width - 1; i++) {
+            for (int j = 0; j < height - 1; j++) {
+                int cur = map[i][j];
+                Color color = null;
+
+                if (cur == 0) {
+                    color = Color.BLACK;
+                } else {
+                    int ind = 0;
+                    for (int i0 = 0; i0 < labels.size(); i0++) {
+                        if (labels.get(i0).contains(cur)) {
+                            ind = i0;
+                            break;
+                        }
+                    }
+                    color = colors.get(ind);
+                }
+                result.setRGB(i, j, color.getRGB());
+            }
         }
 
         return result;
