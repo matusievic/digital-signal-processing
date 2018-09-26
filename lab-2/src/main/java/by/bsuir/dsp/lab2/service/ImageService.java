@@ -234,7 +234,7 @@ public final class ImageService {
 
             // perimeter
             v.forEach(p -> {
-                if (map[p.x - 1][p.y] == 0 || map[p.x + 1][p.y] == 0 || map[p.x][p.y - 1] == 0 || map[p.x][p.y + 1] == 0) {
+                if ((p.x > 1 && map[p.x - 1][p.y] == 0 ) || (p.x < width - 1 && map[p.x + 1][p.y] == 0) || (p.y > 0 && map[p.x][p.y - 1] == 0) || (p.y < height - 1 && map[p.x][p.y + 1] == 0)) {
                     perimeter.merge(k, 1, (cur, i) -> cur + i);
                 }
             });
@@ -326,11 +326,24 @@ public final class ImageService {
     }
 
     private static double distance(Property p1, Property p2) {
-        return Math.sqrt(Math.pow(p1.getSquare() - p2.getSquare(), 2)
-                + Math.pow(p1.getPerimeter() - p2.getPerimeter(), 2)
-                + Math.pow(p1.getDensity() - p2.getDensity(), 2)
-                + Math.pow(p1.getElongation() - p2.getElongation(), 2)
-                + Math.pow(p1.getOrientation() - p2.getOrientation(), 2));
+        double a = 0, b = 0, c = 0, d = 0, e = 0;
+
+        a = Math.pow(p1.getSquare() - p2.getSquare(), 2);
+        b = Math.pow(p1.getPerimeter() - p2.getPerimeter(), 2);
+
+        if (!Double.isNaN(p1.getDensity()) && !Double.isNaN(p2.getDensity())) {
+            c = Math.pow(p1.getDensity() - p2.getDensity(), 2);
+        }
+
+        if (!Double.isNaN(p1.getElongation()) && !Double.isNaN(p2.getElongation())) {
+            d = Math.pow(p1.getElongation() - p2.getElongation(), 2);
+        }
+
+        if (!Double.isNaN(p1.getOrientation()) && !Double.isNaN(p2.getOrientation())) {
+            e = Math.pow(p1.getOrientation() - p2.getOrientation(), 2);
+        }
+
+        return Math.sqrt(a + b + c + d + e);
     }
 
     private static Property nearest(Property p, List<Property> centers) {
