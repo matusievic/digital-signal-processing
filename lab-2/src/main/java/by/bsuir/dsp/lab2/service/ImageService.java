@@ -281,7 +281,6 @@ public final class ImageService {
     }
 
     public static List<List<Map.Entry<Integer, Property>>> kMeans(Map<Integer, Property> objects, int k) {
-        //Map<Property, List<Map.Entry<Integer, Property>>> clusters = new HashMap<>(k);
         List<List<Map.Entry<Integer, Property>>> clusters = new ArrayList<>(k);
         for (int i = 0; i < k; i++) {
             clusters.add(new ArrayList<>());
