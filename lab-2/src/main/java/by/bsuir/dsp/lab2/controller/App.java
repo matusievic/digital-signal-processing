@@ -27,6 +27,10 @@ public class App extends Application {
     @FXML
     private ImageView binaryImageView;
     @FXML
+    private ImageView erosionImageView;
+    @FXML
+    private ImageView dilatationImageView;
+    @FXML
     private ImageView markedImageView;
     @FXML
     private ImageView clusterizedImageView;
@@ -67,7 +71,13 @@ public class App extends Application {
             BufferedImage binary = ImageService.toBinary(source);
             binaryImageView.setImage(SwingFXUtils.toFXImage(binary, null));
 
-            int[][] map = ImageService.mark(binary);
+            BufferedImage erosion = ImageService.erosion(binary);
+            erosionImageView.setImage(SwingFXUtils.toFXImage(erosion, null));
+
+            BufferedImage dilatation = ImageService.dilatation(erosion);
+            dilatationImageView.setImage(SwingFXUtils.toFXImage(dilatation, null));
+
+            int[][] map = ImageService.mark(dilatation);
             BufferedImage marked = ImageService.mapToImage(map);
             markedImageView.setImage(SwingFXUtils.toFXImage(marked, null));
 

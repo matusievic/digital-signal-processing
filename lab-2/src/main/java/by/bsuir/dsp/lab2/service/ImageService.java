@@ -79,6 +79,47 @@ public final class ImageService {
         return result;
     }
 
+    public static BufferedImage erosion(BufferedImage image) {
+        return morph(image, true);
+    }
+
+    public static BufferedImage dilatation(BufferedImage image) {
+        return morph(image, false);
+    }
+
+    private static BufferedImage morph(BufferedImage image, boolean erosionFlag) {
+        int width = image.getWidth();
+        int height = image.getHeight();
+
+        int targetColor = erosionFlag ? Color.WHITE.getRGB() : Color.BLACK.getRGB();
+        int reverseColor = erosionFlag ? Color.BLACK.getRGB() : Color.WHITE.getRGB();
+
+        BufferedImage result = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+
+        for (int i = 0; i < width; i++) {
+            for (int j = 0; j < height; j++) {
+                if (image.getRGB(i, j) == targetColor) {
+                    boolean isReversePixelFound = false;
+                    for (int i0 = i - 3; i0 <= i + 3 && !isReversePixelFound; i0++) {
+                        for (int j0 = j - 3; j0 <= j + 3 && !isReversePixelFound; j0++) {
+                            if (i0 >= 0 && i0 < width && j0 >= 0 && j0 < height && image.getRGB(i0, j0) != targetColor) {
+                                isReversePixelFound = true;
+                                result.setRGB(i, j, reverseColor);
+                            }
+                        }
+                    }
+                    if (!isReversePixelFound) {
+                        result.setRGB(i, j, targetColor);
+                    }
+                } else {
+                    result.setRGB(i, j, reverseColor);
+                }
+            }
+        }
+
+        return result;
+    }
+
     public static int[] getHistogram(BufferedImage image) {
         return getHistogram(image, 'r');
     }
@@ -234,7 +275,7 @@ public final class ImageService {
 
             // perimeter
             v.forEach(p -> {
-                if ((p.x > 1 && map[p.x - 1][p.y] == 0 ) || (p.x < width - 1 && map[p.x + 1][p.y] == 0) || (p.y > 0 && map[p.x][p.y - 1] == 0) || (p.y < height - 1 && map[p.x][p.y + 1] == 0)) {
+                if ((p.x > 1 && map[p.x - 1][p.y] == 0) || (p.x < width - 1 && map[p.x + 1][p.y] == 0) || (p.y > 0 && map[p.x][p.y - 1] == 0) || (p.y < height - 1 && map[p.x][p.y + 1] == 0)) {
                     perimeter.merge(k, 1, (cur, i) -> cur + i);
                 }
             });
@@ -369,13 +410,16 @@ public final class ImageService {
         c.setOrientation(objects.stream().mapToDouble(e -> e.getValue().getOrientation()).sum() / count);
     }
 
-    public static BufferedImage mapToClusteredImage(int[][] map, List<List<Map.Entry<Integer, Property>>> clusters) {
+    public static BufferedImage mapToClusteredImage(int[][] map, List<List<Map.Entry<Integer, Property>>>
+            clusters) {
         int count = clusters.size();
         int width = map.length;
         int height = map[0].length;
 
         List<List<Integer>> labels = clusters.stream()
-                                             .map(ls -> ls.stream().map(Map.Entry::getKey).collect(Collectors.toList()))
+                                             .map(ls -> ls.stream()
+                                                          .map(Map.Entry::getKey)
+                                                          .collect(Collectors.toList()))
                                              .collect(Collectors.toList());
 
         BufferedImage result = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
