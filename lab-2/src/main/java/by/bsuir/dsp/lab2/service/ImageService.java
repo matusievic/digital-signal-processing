@@ -37,28 +37,29 @@ public final class ImageService {
         int black = new Color(0, 0, 0).getRGB();
 
         int[] histogram = getHistogram(gray);
-        int m = 0;
-        int n = 0;
+        int allIntensitySum = 0;
+        int allPixelCount = 0;
 
         for (int t = 0; t < 256; t++) {
-            m += t * histogram[t];
-            n += histogram[t];
+            allIntensitySum += t * histogram[t];
+            allPixelCount += histogram[t];
         }
 
         double maxSigma = -1;
         int threshold = 0;
 
-        int alpha1 = 0;
-        int beta1 = 0;
+        int firstClassIntensitySum = 0;
+        int firstClassPixelCount = 0;
 
         for (int t = 0; t < 256; t++) {
-            alpha1 += t * histogram[t];
-            beta1 += histogram[t];
+            firstClassIntensitySum += t * histogram[t];
+            firstClassPixelCount += histogram[t];
 
-            double w1 = (double) beta1 / n;
-            double a = (double) alpha1 / beta1 - (double) (m - alpha1) / (n - beta1);
+            double firstClassProb = (double) firstClassPixelCount / allPixelCount;
+            double firstClassMean = (double) firstClassIntensitySum / firstClassPixelCount;
+            double deltaMean = firstClassMean - (double) (allIntensitySum - firstClassIntensitySum) / (allPixelCount - firstClassPixelCount);
 
-            double sigma = w1 * (1 - w1) * a * a;
+            double sigma = firstClassProb * (1 - firstClassProb) * deltaMean * deltaMean;
 
             if (sigma > maxSigma) {
                 maxSigma = sigma;
@@ -91,28 +92,28 @@ public final class ImageService {
         int width = image.getWidth();
         int height = image.getHeight();
 
-        int targetColor = erosionFlag ? Color.WHITE.getRGB() : Color.BLACK.getRGB();
-        int reverseColor = erosionFlag ? Color.BLACK.getRGB() : Color.WHITE.getRGB();
+        int targetColor = erosionFlag ? Color.BLACK.getRGB() : Color.WHITE.getRGB();
+        int reverseColor = erosionFlag ? Color.WHITE.getRGB() : Color.BLACK.getRGB();
 
         BufferedImage result = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
 
         for (int i = 0; i < width; i++) {
             for (int j = 0; j < height; j++) {
-                if (image.getRGB(i, j) == targetColor) {
+                if (image.getRGB(i, j) == reverseColor) {
                     boolean isReversePixelFound = false;
                     for (int i0 = i - 3; i0 <= i + 3 && !isReversePixelFound; i0++) {
                         for (int j0 = j - 3; j0 <= j + 3 && !isReversePixelFound; j0++) {
-                            if (i0 >= 0 && i0 < width && j0 >= 0 && j0 < height && image.getRGB(i0, j0) != targetColor) {
+                            if (i0 >= 0 && i0 < width && j0 >= 0 && j0 < height && image.getRGB(i0, j0) != reverseColor) {
                                 isReversePixelFound = true;
-                                result.setRGB(i, j, reverseColor);
+                                result.setRGB(i, j, targetColor);
                             }
                         }
                     }
                     if (!isReversePixelFound) {
-                        result.setRGB(i, j, targetColor);
+                        result.setRGB(i, j, reverseColor);
                     }
                 } else {
-                    result.setRGB(i, j, reverseColor);
+                    result.setRGB(i, j, targetColor);
                 }
             }
         }
@@ -204,8 +205,6 @@ public final class ImageService {
     }
 
     public static BufferedImage mapToImage(int[][] map) {
-        Color[] colors = {Color.BLUE, Color.CYAN, Color.YELLOW, Color.RED, Color.GREEN, Color.MAGENTA, Color.ORANGE, Color.PINK, Color.LIGHT_GRAY, Color.GRAY};
-
         int width = map.length;
         int height = map[0].length;
 
@@ -224,12 +223,7 @@ public final class ImageService {
         Map<Integer, Color> colorMap = new HashMap<>(labels.size());
         Random r = new Random();
         for (int i = 0; i < labels.size(); i++) {
-            Color color = null;
-            if (i < colors.length) {
-                color = colors[i];
-            } else {
-                color = new Color(r.nextInt(255), r.nextInt(255), r.nextInt(255));
-            }
+            Color color = new Color(r.nextInt(255), r.nextInt(255), r.nextInt(255));
             colorMap.put(labels.get(i), color);
         }
 
@@ -332,11 +326,11 @@ public final class ImageService {
         Random r = new Random();
         for (int i = 0; i < k; i++) {
             centers.add(Property.builder()
-                                .square(r.nextInt(20))
-                                .perimeter(r.nextInt(20))
-                                .density(r.nextInt(20))
-                                .elongation(r.nextInt(20))
-                                .orientation(r.nextInt(20))
+                                .square(r.nextInt(10000))
+                                .perimeter(r.nextInt(1000))
+                                .density(r.nextInt(100))
+                                .elongation(r.nextInt(200))
+                                .orientation(r.nextInt(200))
                                 .build());
         }
 
