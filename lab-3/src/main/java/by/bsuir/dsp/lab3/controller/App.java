@@ -2,9 +2,11 @@ package by.bsuir.dsp.lab3.controller;
 
 import by.bsuir.dsp.lab3.kohonen.Network;
 
+import java.util.Arrays;
+
 public class App {
     public static void main(String[] args) {
-        int[][] source = {
+        /*int[][] sourceO = {
                 {0, 0, 0, 1, 1, 1, 1, 0, 0, 0},
                 {0, 0, 0, 1, 0, 0, 1, 0, 0, 0},
                 {0, 0, 0, 1, 0, 0, 1, 0, 0, 0},
@@ -15,6 +17,19 @@ public class App {
                 {0, 0, 0, 1, 0, 0, 1, 0, 0, 0},
                 {0, 0, 0, 1, 0, 0, 1, 0, 0, 0},
                 {0, 0, 0, 1, 1, 1, 1, 0, 0, 0}
+        };
+
+        int[][] sourceZ = {
+                {1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+                {0, 0, 0, 0, 0, 0, 0, 0, 1, 0},
+                {0, 0, 0, 0, 0, 0, 0, 1, 0, 0},
+                {0, 0, 0, 0, 0, 0, 1, 0, 0, 0},
+                {0, 0, 0, 0, 0, 1, 0, 0, 0, 0},
+                {0, 0, 0, 0, 1, 0, 0, 0, 0, 0},
+                {0, 0, 0, 1, 0, 0, 0, 0, 0, 0},
+                {0, 0, 1, 0, 0, 0, 0, 0, 0, 0},
+                {0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
+                {1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
         };
 
 
@@ -29,10 +44,43 @@ public class App {
                 {0, 0, 0, 0, 0, 0, 1, 0, 0, 0},
                 {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
                 {0, 0, 0, 1, 1, 1, 1, 0, 0, 0}
+        };*/
+
+        int[][] one = {
+                {0, 0, 1, 0, 0},
+                {0, 0, 1, 0, 0},
+                {0, 0, 1, 0, 0},
+                {0, 0, 1, 0, 0},
+                {1, 1, 1, 1, 1}
+        };
+
+        int[][] noizeOne = {
+                {1, 1, 1, 1, 1},
+                {0, 0, 0, 1, 0},
+                {0, 0, 0, 0, 0},
+                {0, 1, 0, 0, 0},
+                {1, 1, 1, 0, 1}
+        };
+
+        int[][] two = {
+                {1, 1, 1, 1, 1},
+                {0, 0, 0, 1, 0},
+                {0, 0, 1, 0, 0},
+                {0, 1, 0, 0, 0},
+                {1, 1, 1, 1, 1}
+        };
+
+        int[][] three = {
+                {1, 1, 1, 1, 1},
+                {0, 0, 0, 0, 1},
+                {1, 1, 1, 1, 1},
+                {0, 0, 0, 0, 1},
+                {1, 1, 1, 1, 1}
         };
 
 
-        Network network = new Network(100).learn(source);
-        System.out.println("RECOGNIZED: " + network.recognize(noized, 0));
+        Network network = new Network(25).learn(one).learn(two).learn(three);
+
+        System.out.println(Arrays.deepToString(network.recognize(noizeOne)));
     }
 }
