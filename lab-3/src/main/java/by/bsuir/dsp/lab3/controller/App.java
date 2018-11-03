@@ -1,7 +1,7 @@
 package by.bsuir.dsp.lab3.controller;
 
 import by.bsuir.dsp.lab3.image.ImageService;
-import by.bsuir.dsp.lab3.kohonen.Network;
+import by.bsuir.dsp.lab3.hopfield.Network;
 import javafx.application.Application;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
