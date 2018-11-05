@@ -2,7 +2,6 @@ package by.bsuir.dsp.lab4.perceptron;
 
 import by.bsuir.dsp.lab4.array.ArrayService;
 
-import java.util.Arrays;
 import java.util.Random;
 
 import static by.bsuir.dsp.lab4.array.ArrayService.toBipolar;
@@ -62,12 +61,12 @@ public class Network {
         }
     }
 
-    public Network learn(int[][] bitmap, double[] result, double rate) {
+    public long learn(int[][] bitmap, double[] result, double a, double b, double maxError) {
         int[] input = toBipolar(bitmap);
         double error;
 
         // back propogate
-        int ind;
+        long iterCount = 0;
         do {
             error = 0;
             supply(input);
@@ -79,7 +78,7 @@ public class Network {
                     if (Math.abs(diff[k]) > error) {
                         error = Math.abs(diff[k]);
                     }
-                    double temp = rate * output[k] * (1.0 - output[k]) * diff[k];
+                    double temp = b * output[k] * (1.0 - output[k]) * diff[k];
                     ho[j][k] += temp * hidden[j];
                     if (j == 0) {
                         t[k] += temp;
@@ -96,16 +95,17 @@ public class Network {
                         }
                         ej += diff[k] * output[k] * (1.0 - output[k]) * ho[j][k];
                     }
-                    double temp = rate * hidden[j] * (1.0 - hidden[j]) * ej;
+                    double temp = a * hidden[j] * (1.0 - hidden[j]) * ej;
                     eh[i][j] += temp * entrance[i];
                     if (i == 0) {
                         q[j] += temp;
                     }
                 }
             }
-        } while (error > 0.008);
+            iterCount++;
+        } while (error > maxError);
 
-        return this;
+        return iterCount;
     }
 
     private void supply(int[] input) {
@@ -146,21 +146,10 @@ public class Network {
                 max = i;
             }
         }
-        System.out.println(Arrays.toString(output));
-        /*for (double[] row : eh) {
-            for (double item : row) {
-                System.out.printf("%4.2f  ", item);
-            }
-            System.out.println();
-        }
-        System.out.println("\n\n");
-        for (double[] row : ho) {
-            for (double item : row) {
-                System.out.printf("%4.2f  ", item);
-            }
-            System.out.println();
-        }*/
         return max;
     }
 
+    public double[] getOutput() {
+        return output;
+    }
 }

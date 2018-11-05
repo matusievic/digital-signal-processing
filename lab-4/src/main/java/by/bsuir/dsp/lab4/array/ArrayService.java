@@ -5,12 +5,12 @@ import java.util.stream.IntStream;
 
 public class ArrayService {
     public static int[] toBipolar(int[] input) {
-        return Arrays.stream(input).map(i -> i == 0 ? -1 : 1).toArray();
+        return Arrays.stream(input).map(i -> i == 0 ? 0 : 1).toArray();
     }
 
     public static int[] toBipolar(int[][] bitmap) {
         int[] input = Arrays.stream(bitmap).flatMapToInt(Arrays::stream).toArray();
-        return Arrays.stream(input).map(i -> i == 0 ? -1 : 1).toArray();
+        return Arrays.stream(input).map(i -> i == 0 ? 0 : 1).toArray();
     }
 
     public static int[] toUnipolar(int[] input) {

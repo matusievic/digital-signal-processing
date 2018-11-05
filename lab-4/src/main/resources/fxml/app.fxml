@@ -2,11 +2,39 @@
 
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.GridPane?>
 <GridPane xmlns="http://javafx.com/javafx/8.0.151" xmlns:fx="http://javafx.com/fxml/1">
-    <ComboBox fx:id="fileBox" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
-    <Button fx:id="recognizeButton" text="OK" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
-    <ImageView fx:id="inputImage" fitHeight="300.0" fitWidth="300.0" GridPane.rowIndex="1" GridPane.columnIndex="0" pickOnBounds="true" preserveRatio="true"/>
-    <ImageView fx:id="resultImage" fitHeight="300.0" fitWidth="300.0" GridPane.rowIndex="1" GridPane.columnIndex="1" pickOnBounds="true" preserveRatio="true"/>
+    <GridPane GridPane.rowIndex="0" GridPane.columnIndex="0">
+        <Label text="Hidden layer size" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+        <TextField fx:id="hiddenLayerSizeField" text="18" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+        <Label text="a" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+        <TextField fx:id="aField" GridPane.rowIndex="1" text="0.2" GridPane.columnIndex="1"/>
+        <Label text="b" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+        <TextField fx:id="bField" text="0.2" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+        <Label text="Error" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+        <TextField fx:id="errorField" text="0.008" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+        <Button fx:id="learnButton" text="Learn" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+        <Label fx:id="iterationsLabel" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+    </GridPane>
+    <GridPane GridPane.rowIndex="0" GridPane.columnIndex="1">
+        <ComboBox fx:id="fileBox" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+        <Button fx:id="recognizeButton" text="Recognize" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+        <ImageView fx:id="inputImage" GridPane.rowIndex="1" GridPane.columnIndex="0" pickOnBounds="true" preserveRatio="true"/>
+        <ImageView fx:id="resultImage" GridPane.rowIndex="1" GridPane.columnIndex="1" pickOnBounds="true" preserveRatio="true"/>
+    </GridPane>
+    <GridPane GridPane.rowIndex="1" GridPane.columnIndex="0" GridPane.columnSpan="2" vgap="10" hgap="10">
+        <Label fx:id="firstClassPercentLabel" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+        <Label fx:id="secondClassPercentLabel" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+        <Label fx:id="thirdClassPercentLabel" GridPane.rowIndex="0" GridPane.columnIndex="2"/>
+        <Label fx:id="fourthClassPercentLabel" GridPane.rowIndex="0" GridPane.columnIndex="3"/>
+        <Label fx:id="fifthClassPercentLabel" GridPane.rowIndex="0" GridPane.columnIndex="4"/>
+        <ImageView fx:id="firstImage" GridPane.rowIndex="1" GridPane.columnIndex="0" pickOnBounds="true" preserveRatio="true"/>
+        <ImageView fx:id="secondImage" GridPane.rowIndex="1" GridPane.columnIndex="1" pickOnBounds="true" preserveRatio="true"/>
+        <ImageView fx:id="thirdImage" GridPane.rowIndex="1" GridPane.columnIndex="2" pickOnBounds="true" preserveRatio="true"/>
+        <ImageView fx:id="fourthImage" GridPane.rowIndex="1" GridPane.columnIndex="3" pickOnBounds="true" preserveRatio="true"/>
+        <ImageView fx:id="fifthImage" GridPane.rowIndex="1" GridPane.columnIndex="4" pickOnBounds="true" preserveRatio="true"/>
+    </GridPane>
 </GridPane>
